@@ -1,0 +1,19 @@
+Loggfile opened
+kalle=anka&tage=erlander
+kalle=anka&tage=erlander
+timeout=2020-01-29+21%3A13%3A58.311832
+timeout=2020-01-29+21%3A14%3A04.321907
+button=pressed
+button=released
+button=pressed
+button=released
+button=pressed
+button=released
+button=pressed
+button=released
+button=pressed
+button=released
+button=pressed
+button=released
+timeout=2020-01-29+21%3A14%3A10.340180
+timeout=2020-01-29+21%3A14%3A16.358329
