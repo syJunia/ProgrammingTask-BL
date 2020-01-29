@@ -1,83 +1,95 @@
 import os
 import time
+import sys, signal
 from gpiozero import Button
 import signal
 import argparse
-import datetime
 import threading
-import sys, signal
-import time
 import requests
 import json
+import schedule
 
-a_lock = threading.Lock()
-
-def timer_function():
-    print("Timeout occured {0}\n".format(datetime.datetime.now()))
-    event = {'timeout': time.strftime("%Y-%m-%d %H:%M")}
-    post_payload(event)
+time_when_pressed = 0
+doubleclick_time = 500
+bounce_time = 50
+time_last_released = 0
+button = Button(2)
 
 
 def signal_handler(signal, frame):
-    print("\nProgram exiting gracefully")
+    print("\nProgram exiting")
     sys.exit(0)
 
+
 signal.signal(signal.SIGINT, signal_handler)
-time_when_pressed = 0
-bounce_time = 100
+
+
+def timer_function():
+    print("Timeout occured {0}\n".format(time.strftime("%H:%M:%S")))
+    event = {'Timer timeout': time.strftime("%Y-%m-%d %H:%M:%S")}
+    post_payload(event)
+
 
 def post_payload(payload):
-    posttime = time.strftime("%Y-%m-%d %H:%M")
+    posttime = time.strftime("%Y-%m-%d %H:%M:%S")
     payload.update( {'posted' : posttime} )
     r = requests.post("http://127.0.0.1:8080", json.dumps(payload))
     if r.status_code != 200 :
-        print("Post Was {0}".format(r.status_code))
+        print("Posting issue, return code was {0}".format(r.status_code))
+
 
 def pressed():
-    time_when_pressed = int(datetime.datetime.now().timestamp())
+    global time_when_pressed
+
+    time_when_pressed = int(round(time.time() * 1000))
     print("Pressed at {0}".format(time_when_pressed))
-    #button_pressed = {'button': 'pressed'}
-    #post_payload(button_pressed)
 
 
 def released():
-    time_when_released = int(datetime.datetime.now().timestamp())
+    global time_last_released
+    global time_when_pressed
+
+    time_when_released = int(round(time.time() * 1000))
     print("Released at {0}".format(time_when_released))
-    if (time_when_pressed - time_when_released < bounce_time):
-        print("Short bounce")
-        button_released = {'button': 'released'}
-        post_payload(button_released)
+    if (time_when_released - time_when_pressed < bounce_time):
+        print("Just a bounce, no event to server")
     else:
-        print("Longer bounce")
-
-button = Button(2)
-
+        print("Longer press")
+        if time_last_released > 0:
+           if time_last_released + doubleclick_time > time_when_released:
+                button_released = {'click': 'doubleclick'}
+                post_payload(button_released)
+                # Reset both release times
+                time_when_released = 0
+                print("Longer press - DC ")
+           else:
+                button_released = {'click': 'singleclick'}
+                post_payload(button_released)
+                print("Longer press - SC")
+        time_last_released = time_when_released
+        print("Longer press made, Button released")
+          
 button.when_pressed = pressed
 button.when_released = released
 
 def main():
+    global bounce_time
+    global doubleclick_time
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--bounce', default=100, help='Press time in ms', type=int)
     parser.add_argument('--timeout', default=5, help='Time beween timeout events', type=int)
+    parser.add_argument('--bounce', default=50, help='Ignore time for clicks in ms', type=int)
+    parser.add_argument('--doubleclick', default=500, help='Time for a secondclick to be registered as doubleclick in ms', type=int)
     args = parser.parse_args()
-    bounce_time = min(100, args.bounce)
+    bounce_time = max(30, args.bounce)
 
-    #print("Got bounce {0}".format(args.bounce))
-    #print("Got timeout {0}".format(args.timeout))
-
-    #start_button_reader()
-    #start_background_timer()
-
+    print("Entering event loop")
     while True:
         try:
-            timer = threading.Timer(args.timeout, timer_function)
+            schedule.every(args.timeout).seconds.do(timer_function)
             while True:
+                schedule.run_pending()
                 time.sleep(1)
-                if not timer.is_alive():
-                    timer = threading.Timer(args.timeout, timer_function)
-                    timer.start()
-                    #print("restarting timer")
         except Exception as  e:
                 print("Exception was {0}".format(e))
                 pass

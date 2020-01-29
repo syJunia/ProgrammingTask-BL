@@ -1,0 +1,2 @@
+Beskriv screen eller systemctl eller docker
+dubbelclick
