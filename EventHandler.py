@@ -77,8 +77,8 @@ def main():
     global doubleclick_time
 
     parser = argparse.ArgumentParser()
-    parser.add_argument('--timeout', default=5, help='Time beween timeout events', type=int)
-    parser.add_argument('--bounce', default=50, help='Ignore time for clicks in ms', type=int)
+    parser.add_argument('--timeout', default=5, help='Time beween status events in s', type=int)
+    parser.add_argument('--bounce', default=50, help='Ignoring time for clicks in ms', type=int)
     parser.add_argument('--doubleclick', default=500, help='Time for a secondclick to be registered as doubleclick in ms', type=int)
     args = parser.parse_args()
     bounce_time = max(30, args.bounce)
