@@ -5,7 +5,7 @@ For test: The server could be a local server that can receive the messages and s
 
 The button handling should handle contact bouncing and be able to detect different button events such as click, and double click.
 
-The code is tested with python3
+The code is tested with python3 and python2
 
 ##### How to use:
 
