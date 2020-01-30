@@ -5,11 +5,6 @@ For test: The server could be a local server that can receive the messages and s
 
 The button handling should handle contact bouncing and be able to detect different button events such as click, and double click.
 
-##### requirements.txt
-The requirements.txt file should list all Python libraries that your notebooks depend on, and they will be installed using:
-
-pip3 install -r requirements.txt
-
 The code is tested with python3
 
 ##### How to use:
@@ -34,6 +29,10 @@ See chapter 2.5 in this reference https://gpiozero.readthedocs.io/en/stable/reci
 
 
 
+##### requirements.txt
+The requirements.txt file lists all Python libraries that this solution depend on, and they will be installed using:
+
+pip3 install -r requirements.txt
 
 
 
