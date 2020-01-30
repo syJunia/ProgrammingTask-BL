@@ -27,6 +27,7 @@ Start the Eventhandler with
 Timeout status events will occur one a minute and a button mounted as button 2 on the rpi GPIO pins will be detected
 See chapter 2.5 in this reference https://gpiozero.readthedocs.io/en/stable/recipes.html where to mount the button
 
+Watch the log with e.g. another terminal or screen  $tail -f ReceivedStatusInfo.log
 
 
 ##### requirements.txt
